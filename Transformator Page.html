@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Transformator Page | DGA Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body {
+  background: url('https://cdn.pixabay.com/photo/2015/07/08/10/42/solar-835894_1280.jpg') no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 0;
+}
+.container {
+  width: 90%;
+  max-width: 1000px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+h1 {
+  color: #003366;
+  margin-bottom: 30px;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.7);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+.card {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 25px;
+  color: #003366;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+.card p {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #003366;
+  opacity: 0.85;
+}
+footer {
+  margin-top: 25px;
+  font-size: 0.9rem;
+  color: #003366;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.6);
+}
+.back {
+  display: inline-block;
+  margin-bottom: 25px;
+  color: #003366;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.8);
+}
+.back:hover {text-decoration: underline;}
+</style>
+</head>
+<body>
+  <div class="container">
+    <a class="back" href="FMEA Check Beta.html">⬅ Kembali</a>
+    <h1>Pilih Analisis Transformator</h1>
+
+    <div class="grid">
+      <div class="card" onclick="window.location.href='Transformator Visual.html'">
+        Visual Inspection
+        <p>Pemeriksaan visual dan dokumentasi kondisi transformator.</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='Transformator Insulation.html'">
+        Insulation Test
+        <p>Pengujian tahanan isolasi dan dielektrik strength.</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='Transformator Ratio.html'">
+        Turns Ratio Test
+        <p>Pengukuran rasio lilitan dan keseimbangan fasa.</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='Transformator Winding.html'">
+        Winding Resistance
+        <p>Pengujian tahanan kumparan untuk mendeteksi koneksi longgar.</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='Transformator Oil.html'">
+        Oil Quality Test
+        <p>Analisis kualitas minyak isolasi (BDV, DGA, moisture).</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='Transformator Thermal.html'">
+        Thermal Monitoring
+        <p>Evaluasi suhu dan sistem pendingin transformator.</p>
+      </div>
+    </div>
+
+    <footer>© 2025 | PLN Nusantara Power</footer>
+  </div>
+</body>
+</html>

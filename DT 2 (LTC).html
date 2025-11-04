@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DGA CHECK | Duval Triangle 2 (LTC) — Rekomendasi Action</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f5f7fb; margin: 0; padding: 0; }
+    header { background-color: #003399; color: white; padding: 15px 40px; font-size: 20px; font-weight: bold; }
+    .main { display:flex; justify-content:space-between; margin:20px auto; width:90%; background:white; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); padding:20px; }
+    .input-section { width:30%; }
+    .chart-section { width:65%; }
+    label { font-weight:600; display:block; margin-top:10px; }
+    input { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px; }
+    button { background-color:#003399; color:white; border:none; padding:10px 15px; border-radius:5px; margin-top:15px; font-weight:bold; cursor:pointer; }
+    button:hover { background-color:#001f66; }
+    .hasil { margin-top:15px; background-color:#eef2ff; border-left:5px solid #003399; padding:10px; border-radius:5px; }
+    h2 { color:#003399; font-size:18px; border-bottom:2px solid #003399; padding-bottom:5px; }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th { background-color:#003399; color:white; padding:12px; text-align:center; }
+    td { border:1px solid #ddd; padding:8px; text-align:center; }
+    .action-buttons { margin-top:15px; text-align:right; }
+    .btn-excel { background-color:#003399; margin-right:10px; color:white; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+    .btn-delete { background-color:#c62828; color:white; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+    footer { background-color:#003399; color:white; text-align:center; padding:10px; margin-top:40px; }
+    .toast { position:fixed; bottom:25px; right:25px; background-color:#003399; color:white; padding:10px 16px; border-radius:6px; opacity:0; transition:opacity 0.4s ease; pointer-events:none; font-size:14px; }
+    .toast.show { opacity:1; pointer-events:auto; }
+  </style>
+</head>
+<body>
+
+<header style="position: relative;">
+  DGA CHECK | Duval Triangle 2 (LTC) — Rekomendasi Action
+  <a href="Halaman ke 2.html"
+     style="text-decoration:none; background-color:#003399; color:white; padding:8px 14px; border-radius:6px; position:absolute; right:40px; top:12px; font-size:15px; transition:background-color 0.2s;">
+     ⬅ Kembali
+  </a>
+</header>
+
+
+<div class="main">
+  <div class="input-section">
+    <h2>Analisis Duval Triangle 2 (LTC)</h2>
+    <label for="ch4">CH₄ (Methane):</label>
+    <input type="number" id="ch4" placeholder="contoh: 20">
+
+    <label for="c2h2">C₂H₂ (Acetylene):</label>
+    <input type="number" id="c2h2" placeholder="contoh: 10">
+
+    <label for="c2h4">C₂H₄ (Ethylene):</label>
+    <input type="number" id="c2h4" placeholder="contoh: 30">
+
+    <button onclick="hitungDanPlot()">Hitung & Simpan</button>
+    <div class="hasil" id="hasilText">Hasil analisis akan muncul di sini.</div>
+  </div>
+
+  <div class="chart-section">
+    <div id="duvalPlot" style="width:100%; height:500px;"></div>
+  </div>
+</div>
+
+<div class="container" style="width:90%; margin:auto; background:white; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+  <h2>Riwayat Analisis</h2>
+  <table id="hasilTable">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>CH₄</th>
+        <th>C₂H₂</th>
+        <th>C₂H₄</th>
+        <th>Fault</th>
+        <th>Rekomendasi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="action-buttons">
+    <button class="btn-excel" onclick="downloadExcel()">📥 Unduh Excel</button>
+    <button class="btn-delete" onclick="hapusSemua()">🗑️ Hapus Semua</button>
+  </div>
+</div>
+
+<footer>© 2025 DGA Check | PLN Nusantara Power</footer>
+
+<div class="toast" id="toast">Data disimpan ke Excel</div>
+
+<script>
+const STORAGE_KEY = "riwayat_duval2_ltc";
+let hasilData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+updateTable();
+
+const regions = [
+  { name: 'X1 - Abnormal Arcing / Mixed', color: 'rgba(255, 235, 59, 0.7)', short: 'X1', coords: [ [19,81,0], [100,0,0], [77,0,23], [19,58,23] ] },
+  { name: 'T2 - Thermal Fault <300°C', color: 'rgba(66,133,244,0.55)', short: 'T2', coords: [ [77,0,23], [50,0,50], [35,15,50], [62,15,23] ] },
+  { name: 'T3 - Thermal Fault >700°C', color: 'rgba(13,71,161,0.55)', short: 'T3', coords: [ [50,0,50], [35,15,50], [0,15,85], [0,0,100] ] },
+  { name: 'X3 - Fault T2/T3 in Progress (Coking)', color: 'rgba(244,67,54,0.25)', short: 'X3', coords: [ [0,77,23], [62,15,23], [0,15,85] ] },
+  { name: 'N - Normal Operation', color: 'rgba(102,187,106,0.35)', short: 'N', coords: [ [19,75,6], [19,58,23], [2,75,23], [2,92,6] ] },
+  { name: 'D1 - Abnormal Arcing', color: 'rgba(255,167,38,0.4)', short: 'D1', coords: [ [19,81,0], [19,75,6], [2,92,6], [2,75,23], [0,77,23], [0,100,0] ] }
+];
+
+function ternaryToXY(a,b,c){const s=a+b+c;if(s===0)return{x:0,y:0};const an=a/s,cn=c/s;const sqrt3over2=Math.sqrt(3)/2;return{x:0.5*an+cn,y:an*sqrt3over2};}
+function pointInPolygon2D(p,poly){let x=p.x,y=p.y,inside=false;for(let i=0,j=poly.length-1;i<poly.length;j=i++){const xi=poly[i].x,yi=poly[i].y;const xj=poly[j].x,yj=poly[j].y;const intersect=((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi+1e-12)+xi);if(intersect)inside=!inside;}return inside;}
+function detectRegionForPoint(a,b,c){const pt=ternaryToXY(a,b,c);for(const r of regions){const poly=r.coords.map(v=>ternaryToXY(v[0],v[1],v[2]));if(pointInPolygon2D(pt,poly))return r;}return null;}
+
+function getRekomendasi(shortCode){
+  const rekomendasiMap={
+    "N":`<b>Rekomendasi:</b><br>1. Kondisi normal, lanjutkan operasi rutin.<br>2. Monitoring DGA dilakukan setiap <b>6 bulan</b>.<br>3. Lakukan pemeliharaan LTC sesuai panduan pabrikan.`,
+    "D1":`<b>Rekomendasi:</b><br>1. Terindikasi arcing ringan pada kontak diverter.<br>2. Lakukan inspeksi visual dan pengukuran resistansi kontak.<br>3. Ganti oli LTC bila terkontaminasi.<br>4. Lakukan sampling ulang gas dalam <b>1 bulan</b>.`,
+    "X1":`<b>Rekomendasi:</b><br>1. Indikasi campuran arcing ringan.<br>2. Inspeksi diverter switch dan kondisi oli.<br>3. Monitoring gas dilakukan setiap <b>1 bulan</b>.<br>4. Jika tren meningkat, jadwalkan outage inspeksi internal.`,
+    "X3":`<b>Rekomendasi:</b><br>1. Arcing berat / coking pada ruang diverter.<br>2. Lakukan <b>shutdown terencana</b> untuk inspeksi internal LTC.<br>3. Bersihkan jelaga karbon dan ganti oli.<br>4. Uji kembali DGA setelah perbaikan.`,
+    "T2":`<b>Rekomendasi:</b><br>1. Indikasi thermal fault <300°C.<br>2. Pastikan sistem pendingin dan beban kontak diverter normal.<br>3. Monitoring gas setiap <b>1 bulan</b>.<br>4. Jika tren naik, lakukan inspeksi internal LTC.`,
+    "T3":`<b>Rekomendasi:</b><br>1. Thermal fault >700°C (severe overheating).<br>2. <b>Segera hentikan operasi LTC</b> bila aman.<br>3. Inspeksi dan ganti komponen terbakar.<br>4. Lakukan uji DGA ulang setelah perbaikan.`
+  };
+  return rekomendasiMap[shortCode]||`<b>Rekomendasi:</b><br>1. Tidak terklasifikasi spesifik.<br>2. Periksa kondisi LTC secara umum dan lakukan monitoring ulang.`;
+}
+
+function hitungDanPlot(){
+  const ch4=parseFloat(document.getElementById("ch4").value),c2h2=parseFloat(document.getElementById("c2h2").value),c2h4=parseFloat(document.getElementById("c2h4").value);
+  if(isNaN(ch4)||isNaN(c2h2)||isNaN(c2h4)||(ch4+c2h2+c2h4)===0){alert("Isi semua nilai gas dengan benar!");return;}
+  const total=ch4+c2h2+c2h4;const pCH4=(ch4/total)*100,pC2H2=(c2h2/total)*100,pC2H4=(c2h4/total)*100;
+  const foundRegion=detectRegionForPoint(pCH4,pC2H4,pC2H2);
+  let fault=foundRegion?foundRegion.name:"Tidak terklasifikasi (Periksa Data)";
+  const rekom=getRekomendasi(foundRegion?foundRegion.short:"");
+
+  document.getElementById("hasilText").innerHTML=`
+    Hasil: <b>${fault}</b><br>
+    %CH₄ = ${pCH4.toFixed(1)} | %C₂H₂ = ${pC2H2.toFixed(1)} | %C₂H₄ = ${pC2H4.toFixed(1)}
+    ${foundRegion?`<br><small>Region warna: <span style="font-weight:700;color:${foundRegion.color};">${foundRegion.short}</span></small>`:''}
+    <hr>
+    ${rekom}
+  `;
+
+  hasilData.push({tanggal:new Date().toLocaleString(),ch4,c2h2,c2h4,fault,rekom});
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(hasilData));
+  updateTable();
+  plotDuval2(pCH4,pC2H2,pC2H4,foundRegion);
+}
+
+function plotDuval2(pCH4,pC2H2,pC2H4,foundRegion=null){
+  const traces=regions.map(r=>({type:'scatterternary',mode:'lines',fill:'toself',fillcolor:r.color,line:{color:'black',width:1},name:r.name,a:r.coords.map(p=>p[0]),b:r.coords.map(p=>p[1]),c:r.coords.map(p=>p[2]),hoverinfo:'text',text:r.name}));
+  const markerColor=foundRegion?foundRegion.color.replace(/rgba\(([^)]+)\)/,(m,g)=>{const parts=g.split(',');return`rgb(${parts[0].trim()},${parts[1].trim()},${parts[2].trim()})`;}):'black';
+  const point={type:'scatterternary',mode:'markers',a:[pCH4],b:[pC2H4],c:[pC2H2],marker:{color:markerColor,size:14,line:{color:'#222',width:1}},name:'Hasil'};
+
+  const layout = {
+  ternary: {
+    sum: 100,
+    aaxis: {
+      title: { text: '%CH₄', font: { size: 12 } },
+      min: 0, ticksuffix: '%', tick0: 0, dtick: 10
+    },
+    baxis: {
+      title: { text: '%C₂H₄', standoff: 55, font: { size: 12 } }, // posisi tetap
+      min: 0, ticksuffix: '%', tick0: 0, dtick: 10
+    },
+    caxis: {
+      title: { text: '%C₂H₂', standoff: 75, font: { size: 12 } }, // +4 spasi ke kanan
+      min: 0, ticksuffix: '%', tick0: 0, dtick: 10
+    }
+  },
+  title: { text: 'THE DUVAL TRIANGLE 2 FOR LTC OILS', font: { size: 16 } },
+  height: 520,
+  showlegend: true,
+  legend: { orientation: 'h', x: 0.1, y: -0.25 },
+  margin: { l: 80, r: 90, b: 90, t: 60 } // beri sedikit ruang kanan ekstra
+};
+  Plotly.react('duvalPlot',[...traces,point],layout,{responsive:true});
+}
+
+function updateTable(){const tbody=document.querySelector("#hasilTable tbody");tbody.innerHTML=hasilData.length===0?'<tr><td colspan="6" style="color:#888;">Belum ada data</td></tr>':hasilData.map(d=>`<tr><td>${d.tanggal}</td><td>${d.ch4}</td><td>${d.c2h2}</td><td>${d.c2h4}</td><td>${d.fault}</td><td>${d.rekom}</td></tr>`).join('');}
+function hapusSemua(){if(confirm("Hapus semua riwayat analisis?")){hasilData=[];localStorage.removeItem(STORAGE_KEY);updateTable();}}
+function downloadExcel(){let csv="Tanggal,CH4,C2H2,C2H4,Fault,Rekomendasi\n";hasilData.forEach(d=>{const rekom=(d.rekom||"").replace(/,/g,';');csv+=`${d.tanggal},${d.ch4},${d.c2h2},${d.c2h4},"${d.fault}","${rekom}"\n`;});const blob=new Blob([csv],{type:'text/csv'});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="riwayat_duval2_ltc.csv";a.click();showToast();}
+function showToast(){const toast=document.getElementById("toast");toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),2000);}
+
+// tampilkan segitiga Duval saat halaman pertama kali dibuka
+plotDuval2(0,0,100);
+</script>
+</body>
+</html>

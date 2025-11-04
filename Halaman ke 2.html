@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Halaman Kedua | DGA Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body {
+  background: url('https://cdn.pixabay.com/photo/2013/03/01/18/50/coal-88061_1280.jpg') no-repeat center center fixed;
+  background-size: cover;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 0;
+}
+.container {
+  width: 90%;
+  max-width: 1000px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* ✅ Banner Warning */
+.warning-banner {
+  position: absolute;
+  top: -65px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FF0000;
+  padding: 18px 32px;
+  min-width: 560px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1e1500;
+  border-radius: 14px;
+  border: 2.5px solid rgba(0,0,0,0.95);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.28);
+  letter-spacing: 0.4px;
+  backdrop-filter: blur(4px);
+  animation: fadeInAlert 0.6s ease;
+}
+/* ⚠️ Icon animasi merah berkedip */
+.warning-banner span {
+  margin-right: 8px;
+  font-size: 1.45rem;
+  font-weight: bold;
+  color: #ff0000;
+  animation: blinkIcon 1.15s infinite ease-in-out;
+}
+
+/* Animasi ikon */
+@keyframes blinkIcon {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(1.25); }
+  100% { opacity: 1; transform: scale(1); }
+}
+h1 {
+  color: #003366;
+  margin-bottom: 30px;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.7);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+.card {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 25px;
+  color: #003366;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+.card p {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #003366;
+  opacity: 0.85;
+}
+footer {
+  margin-top: 25px;
+  font-size: 0.9rem;
+  color: #003366;
+  text-shadow: 0 1px 4px rgba(255,255,255,0.6);
+}
+.back {
+  display: inline-block;
+  margin-bottom: 25px;
+  color: #003366;
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(255,255,255,0.8);
+}
+.back:hover {text-decoration: underline;}
+
+/* === Modal (Popup) === */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.modal {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 30px 40px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+}
+.modal h2 {color:#003366;font-size:1.4rem;margin-bottom:20px;}
+.modal button {
+  display: block;
+  width: 100%;
+  padding: 12px 0;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.modal .bio{background:#007bff;color:white;}
+.modal .bio:hover{background:#0056b3;}
+.modal .fr3{background:#00bfa5;color:white;}
+.modal .fr3:hover{background:#00997a;}
+.modal .silicone{background:#ff9800;color:white;}
+.modal .silicone:hover{background:#e68900;}
+.modal .midel{background:#6a1b9a;color:white;}
+.modal .midel:hover{background:#4a148c;}
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 22px; color: #666;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.close-btn:hover { color: #000; }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ✅ Banner Warning -->
+    <div class="warning-banner">
+    <span>⚠️</span> <b>Aktivitas:</b> Pastikan Anda Sudah Memilih Duval Sesuai Kebutuhan Anda
+    </div>
+
+    <a class="back" href="Index.html">⬅ Kembali</a>
+    <h1>Pilih Analisis DGA</h1>
+
+    <div class="grid">
+      <div class="card" onclick="window.location.href='Duval Triangle 1 Fix.html'">
+        Duval Triangle 1
+        <p>Mineral Oil.</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='DT 2 (LTC).html'">
+        Duval Triangle 2
+        <p>Load Tap Changer.</p>
+      </div>
+
+      <div class="card" onclick="openModal()">
+        Duval Triangle 3
+        <p>Bio Temp, FR3, Silicone, Midel.</p>
+      </div>
+
+      <div class="card">
+        Duval Triangle 4
+        <p>Mineral Oil.</p>
+      </div>
+
+      <div class="card">
+        Duval Triangle 5
+        <p>LTF Mineral Oil.</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='Duval Triangle 6 LTF FR3 Oil Fix v.html'">
+         Duval Triangle 6
+       <p>LTF FR3 Oil.</p>
+      </div>
+
+      <div class="card" onclick="window.location.href='Duval Triangle 7 Thermal Fault FR3 Oil v.html'">
+        Duval Triangle 7
+       <p>FR3 Oil Thermal Fault.</p>
+      </div>
+
+    <footer>© 2025 | PLN Nusantara Power</footer>
+  </div>
+
+  <!-- Modal Popup -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <h2>Pilih Jenis Analisis Duval 3</h2>
+      <button class="bio" onclick="window.location.href='Duval Triangle 3 Bio Temp Fix.html'">Bio Temp</button>
+      <button class="fr3" onclick="window.location.href='Duval Triangle 3 FR3 Oil Fix.html'">FR3 Oil</button>
+      <button class="silicone" onclick="window.location.href='Duval Triangle 3 Silicon Fix.html'">Silicone Oil</button>
+      <button class="midel" onclick="window.location.href='Duval Triangle 3 Midel Fix.html'">Midel Oil</button>
+    </div>
+  </div>
+
+<script>
+function openModal(){document.getElementById('modal').style.display='flex';}
+function closeModal(){document.getElementById('modal').style.display='none';}
+window.onclick=function(e){const m=document.getElementById('modal');if(e.target===m)m.style.display='none';}
+</script>
+</body>
+</html>

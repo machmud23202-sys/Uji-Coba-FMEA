@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DGA Check | Duval Triangle 3 (FR3 OIL) — Versi Deteksi Wilayah</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background-color: #f5f7fb; margin: 0; padding: 0; }
+    header { background-color: #003399; color: white; padding: 15px 40px; font-size: 20px; font-weight: bold; }
+    .main { display:flex; justify-content:space-between; margin:20px auto; width:90%; background:white; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); padding:20px;}
+    .input-section { width:30%; }
+    .chart-section { width:65%; }
+    label { font-weight:600; display:block; margin-top:10px; }
+    input { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:5px; }
+    button { background-color:#003399; color:white; border:none; padding:10px 15px; border-radius:5px; margin-top:15px; font-weight:bold; cursor:pointer;}
+    button:hover { background-color:#001f66; }
+    .hasil { margin-top:15px; background-color:#eef2ff; border-left:5px solid #003399; padding:15px; border-radius:5px; font-size:15px; line-height:1.6; }
+    .hasil b { color:#001f66; }
+    h2 { color:#003399; font-size:18px; border-bottom:2px solid #003399; padding-bottom:5px; }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th { background-color:#003399; color:white; padding:12px; text-align:center; }
+    td { border:1px solid #ddd; padding:8px; text-align:center; }
+    .action-buttons { margin-top:15px; text-align:right; }
+    .btn-excel { background-color:#003399; margin-right:10px; color:white; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+    .btn-delete { background-color:#c62828; color:white; padding:8px 12px; border-radius:6px; border:none; cursor:pointer; }
+    footer { background-color:#003399; color:white; text-align:center; padding:10px; margin-top:40px; }
+    .toast { position:fixed; bottom:25px; right:25px; background-color:#003399; color:white; padding:10px 16px; border-radius:6px; opacity:0; transition:opacity 0.4s ease; pointer-events:none; font-size:14px; }
+    .toast.show { opacity:1; pointer-events:auto; }
+  </style>
+</head>
+<body>
+
+<header>DGA Check | Duval Triangle 7 Thermal Fault FR3 OIL — Deteksi Wilayah</header>
+<a href="Halaman ke 2.html"
+     style="text-decoration:none; background-color:#003399; color:white; padding:8px 14px; border-radius:6px; position:absolute; right:40px; top:12px; font-size:15px; transition:background-color 0.2s;">
+     ⬅ Kembali
+  </a>
+</header>
+
+<div class="main">
+  <div class="input-section">
+    <h2>Analisis Duval Triangle 7 Thermal Fault FR3 OIL </h2>
+    <label for="ch4">CH₄ (Methane):</label>
+    <input type="number" id="ch4" placeholder="contoh: 20">
+
+    <label for="c2h4">C₂H₄ (Ethylene):</label>
+    <input type="number" id="c2h4" placeholder="contoh: 30">
+
+    <label for="c2h6">C₂H₆ (Ethane):</label>
+    <input type="number" id="c2h6" placeholder="contoh: 10">
+
+    <button onclick="hitungDanPlot()">Hitung & Simpan</button>
+    <div class="hasil" id="hasilText">Hasil analisis akan muncul di sini.</div>
+  </div>
+
+  <div class="chart-section">
+    <div id="duvalPlot" style="width:100%; height:500px;"></div>
+  </div>
+</div>
+
+<div class="container" style="width:90%; margin:auto; background:white; padding:20px; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+  <h2>Riwayat Analisis</h2>
+  <table id="hasilTable">
+    <thead>
+      <tr>
+        <th>Tanggal</th>
+        <th>CH₄</th>
+        <th>C₂H₄</th>
+        <th>C₂H₆</th>
+        <th>Fault</th>
+        <th>Rekomendasi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div class="action-buttons">
+    <button class="btn-excel" onclick="downloadExcel()">📥 Unduh Excel</button>
+    <button class="btn-delete" onclick="hapusSemua()">🗑️ Hapus Semua</button>
+  </div>
+</div>
+
+<footer>© 2025 DGA Check | PLN Nusantara Power</footer>
+
+<div class="toast" id="toast">Data disimpan ke Excel</div>
+
+<script>
+const STORAGE_KEY = "riwayat_duval3_biotemp";
+let hasilData = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+updateTable();
+
+const regions = [
+  { name: 'PD', color: 'rgba(255, 235, 59, 0.7)', short: 'PD',
+    coords: [ [100,-1,-1], [100,1,0], [100,0,1], ] },
+  { name: 'O', color: 'rgba(66,133,244,0.55)', short: 'O',
+    coords: [ [100,1,0], [100,0,1], [200,0,340], [260,90,590], [100,11,0] ] },
+  { name: 'S', color: 'rgba(13,71,161,0.55)', short: 'S',
+    coords: [ [200,0,340], [-1,-1,100], [0,140,960], [290,150,750] ] },
+  { name: 'C', color: 'rgba(244,67,54,0.25)', short: 'C',
+    coords: [ [100,11,0], [820,130,400],[600,590,510], [100,53,0 ] ] },
+  { name: 'T3', color: 'rgba(102,187,106,0.35)', short: 'DT',
+    coords: [ [100,53,0], [-1,100,-1], [0,357,643] ] },
+  { name: 'N/D', color: 'rgba(255,167,38,0.4)', short: 'D1',
+  coords: [ [0,140,960], [290,150,750], [260,90,590], [820,130,400],[600,590,510],[0,357,643] ] },
+];
+
+// === REKOMENDASI UNTUK SETIAP FAULT ===
+const rekomendasiMap = {
+  "PD": {
+    hasil: "Partial Discharge (PD)",
+    rekom: [
+      "Lakukan uji DGA lanjutan dalam 1–3 bulan.",
+      "Periksa kelembapan minyak dan kondisi celah udara internal.",
+      "Lakukan inspeksi visual bila tersedia jendela/akses internal.",
+      "Monitor tren gas H₂ untuk mendeteksi peningkatan aktivitas PD."
+    ]
+  },
+  "S": {
+    hasil: "Stray Gassing of FR3 Oil (S)",
+    rekom: [
+      "Tidak perlu tindakan korektif langsung.",
+      "Pastikan sampel minyak diambil ulang setelah 6 bulan untuk konfirmasi.",
+      "Catat tren gas ringan (CH₄, C₂H₆) untuk memastikan kestabilan.",
+      "Verifikasi suhu operasi trafo tidak melebihi ambang desain FR3."
+    ]
+  },
+  "O": {
+    hasil: "Overheating < 250°C (O)",
+    rekom:[
+      "Periksa beban transformator dan kondisi pendinginan.",
+      "Lakukan termografi inframerah untuk deteksi titik panas eksternal",
+      "Ukur tahanan kontak pada tap changer atau koneksi terminal.",
+      "Ulangi DGA setelah 1–2 bulan untuk melihat tren kenaikan gas."
+    ]
+  },
+  "C": {
+    hasil: "Hot Spot with Carbonization > 300°C (C)",
+    rekom: [
+      " Lakukan inspeksi internal (offline test) bila memungkinkan.",
+      " Analisis rasio gas CH₄/C₂H₄/C₂H₆ untuk menilai stabilitas hotspot.",
+      " Pantau tren gas harian/mingguan, terutama CH₄ dan CO.",
+      " Jika peningkatan signifikan, rencanakan shutdown untuk verifikasi fisik."
+    ]
+  },
+  "T3": {
+    hasil: "Severe Thermal Fault > 700 °C (T3)",
+    rekom: [
+      " Segera matikan transformator (emergency shutdown).",
+      " Lakukan uji visual internal dan termal, cari sumber panas ekstrem.",
+      " Uji resistansi belitan dan tap changer.",
+      " Ganti minyak dan uji ulang DGA setelah perbaikan untuk memastikan stabilitas."
+    ]
+  },
+  "N/D": {
+    hasil: "Not Determined (N/D)",
+    rekom: [
+      "Ulangi sampling DGA dalam 1 bulan.",
+      "Verifikasi kondisi operasional trafo (beban & suhu).",
+      "Pastikan kualitas sampel dan metode pengambilan benar.",
+      "Bila tren gas meningkat, lakukan analisis lanjutan dengan Triangle 3."
+    ]
+  },
+};
+
+function ternaryToXY(a, b, c) {
+  const s = a + b + c;
+  if (s === 0) return { x: 0, y: 0 };
+  const an = a / s, bn = b / s, cn = c / s;
+  const sqrt3over2 = Math.sqrt(3) / 2;
+  const x = 0.5 * an + cn;
+  const y = an * sqrt3over2;
+  return { x, y };
+}
+
+function pointInPolygon2D(point, polygon) {
+  let x = point.x, y = point.y, inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    const intersect = ((yi > y) !== (yj > y)) &&
+                      (x < (xj - xi) * (y - yi) / ((yj - yi) || 1e-12) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
+
+function detectRegionForPoint(a, b, c) {
+  const pt = ternaryToXY(a, b, c);
+  for (let r of regions) {
+    const poly = r.coords.map(p => ternaryToXY(p[0], p[2], p[1]));
+    if (pointInPolygon2D(pt, poly)) return r;
+  }
+  return null;
+}
+
+plotDuval2(0, 0, 100);
+
+function hitungDanPlot() {
+  const ch4 = parseFloat(document.getElementById("ch4").value);
+  const c2h6 = parseFloat(document.getElementById("c2h4").value);
+  const c2h4 = parseFloat(document.getElementById("c2h6").value);
+  if (isNaN(ch4) || isNaN(c2h6) || isNaN(c2h4) || (ch4 + c2h6 + c2h4) === 0) {
+    alert("Isi semua nilai gas dengan benar!");
+    return;
+  }
+  const total = ch4 + c2h6 + c2h4;
+  const pCH4 = (ch4 / total) * 100;
+  const pC2H6 = (c2h6 / total) * 100;
+  const pC2H4 = (c2h4 / total) * 100;
+  const foundRegion = detectRegionForPoint(pCH4, pC2H4, pC2H6);
+  const fault = foundRegion ? foundRegion.name : "Tidak terklasifikasi (Periksa Data)";
+  let hasilTextHTML = "";
+  
+  if (foundRegion && rekomendasiMap[foundRegion.name]) {
+    const info = rekomendasiMap[foundRegion.name];
+    hasilTextHTML = `
+      <b>Hasil:</b> ${info.hasil}<br>
+      <b>Rekomendasi:</b><br>
+      <ol>${info.rekom.map(r => `<li>${r}</li>`).join('')}</ol>
+      <div style="margin-top:8px; color:#333;">
+        %CH₄ = ${pCH4.toFixed(1)} | %C₂H₆ = ${pC2H4.toFixed(1)} | %C₂H₄ = ${pC2H6.toFixed(1)}
+      </div>
+    `;
+  } else {
+    hasilTextHTML = `
+      <b>Hasil:</b> ${fault}<br>
+      <div style="margin-top:8px; color:#333;">
+        %CH₄ = ${pCH4.toFixed(1)} | %C₂H₆ = ${pC2H4.toFixed(1)} | %C₂H₄= ${pC2H6.toFixed(1)}
+      </div>`;
+  }
+
+  document.getElementById("hasilText").innerHTML = hasilTextHTML;
+
+  // === Simpan hasil ke data & localStorage ===
+const info = rekomendasiMap[foundRegion?.name];
+hasilData.push({
+  tanggal: new Date().toLocaleString(),
+  ch4,
+  c2h6,
+  c2h4,
+  fault: info ? info.hasil : fault,
+  rekom: info ? info.rekom.join(" | ") : "-"
+});
+
+localStorage.setItem(STORAGE_KEY, JSON.stringify(hasilData));
+updateTable();
+plotDuval2(pCH4, pC2H4, pC2H6, foundRegion);
+
+}
+
+function plotDuval2(aVal=0,bVal=0,cVal=100,foundRegion=null) {
+  const traces = regions.map(r => ({
+    type: 'scatterternary',
+    mode: 'lines',
+    fill: 'toself',
+    fillcolor: r.color,
+    line: { color: 'black', width: 1 },
+    name: r.name,
+    a: r.coords.map(p => p[0]),
+    b: r.coords.map(p => p[2]),
+    c: r.coords.map(p => p[1])
+  }));
+
+  const normalizeColor = col => col?.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+    ? `rgb(${RegExp.$1},${RegExp.$2},${RegExp.$3})` : (col || 'black');
+
+  const point = {
+    type: 'scatterternary',
+    mode: 'markers',
+    a: [aVal], b: [bVal], c: [cVal],
+    marker: { color: foundRegion ? normalizeColor(foundRegion.color) : 'black', size: 14, line: { color: '#222', width: 1 } },
+    name: 'Hasil'
+  };
+
+  const layout = {
+    ternary: {
+      sum: 100,
+      aaxis: { title: '', min: 0, ticksuffix: '%', dtick: 10 },
+      baxis: { title: '', min: 0, ticksuffix: '%', dtick: 10 },
+      caxis: { title: '', min: 0, ticksuffix: '%', dtick: 10 }
+    },
+    annotations: [
+      { text: "% CH₄ →",  x: 0.25, y: 0.5, textangle: -60, showarrow: false, font: { size: 14, color: '#003399' } },
+      { text: "← % C₂H₆", x: 0.5,  y: -0.15, textangle: 0, showarrow: false, font: { size: 14, color: '#003399' } },
+      { text: "% C₂H₄ →", x: 0.75, y: 0.5, textangle: 60, showarrow: false, font: { size: 14, color: '#003399' } }
+    ],
+    title: 'THE Duval Triangle 7 FOR Thermal Fault FR3 OI',
+    height: 500,
+    showlegend: true,
+    legend: { orientation: 'h', x: 0.1, y: -0.12 }
+  };
+
+  Plotly.react('duvalPlot', [...traces, point], layout, { responsive: true });
+}
+
+function updateTable() {
+  const tbody = document.querySelector("#hasilTable tbody");
+  tbody.innerHTML = hasilData.length
+    ? hasilData.map(d => `
+        <tr>
+          <td>${d.tanggal}</td>
+          <td>${d.ch4}</td>
+          <td>${d.c2h6}</td>
+          <td>${d.c2h4}</td>
+          <td>${d.fault}</td>
+          <td>${d.rekom}</td>
+        </tr>`).join('')
+    : '<tr><td colspan="6" style="color:#888;">Belum ada data</td></tr>';
+}
+
+function hapusSemua() {
+  if (confirm("Hapus semua riwayat analisis?")) {
+    hasilData = [];
+    localStorage.removeItem(STORAGE_KEY);
+    updateTable();
+  }
+}
+
+function downloadExcel() {
+  let csv = "Tanggal,CH4,C2H4,C2H6,Fault,Rekomendasi\n";
+  hasilData.forEach(d => {
+    const rekom = (d.rekom || "").replace(/,/g, ';');
+    csv += `${d.tanggal},${d.ch4},${d.c2h6},${d.c2h4},"${d.fault}","${rekom}"\n`;
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "riwayat_duval7_TFFR3OIL.csv";
+  a.click();
+  showToast();
+}
+
+function showToast() {
+  const toast = document.getElementById("toast");
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 2000);
+}
+</script>
+</body>
+</html>
